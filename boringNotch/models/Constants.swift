@@ -544,6 +544,7 @@ extension Defaults.Keys {
     static let calendarWeekView = Key<Bool>("calendarWeekView", default: false)
     static let weekStartDay = Key<WeekStartDay>("weekStartDay", default: .system)
     static let joinMeetingOnEventTap = Key<Bool>("joinMeetingOnEventTap", default: true)
+    static let showEventIndicators = Key<Bool>("showEventIndicators", default: true)
 
     // MARK: Fullscreen Media Detection
     static let hideNotchOption = Key<HideNotchOption>("hideNotchOption", default: .nowPlayingOnly)

@@ -47,6 +47,9 @@ struct CalendarSettings: View {
                 Defaults.Toggle(key: .hideAllDayEvents) {
                     Text("Hide all-day events")
                 }
+                Defaults.Toggle(key: .showEventIndicators) {
+                    Text("Show dots on days with events")
+                }
                 Defaults.Toggle(key: .autoScrollToNextEvent) {
                     Text("Auto-scroll to next event")
                 }

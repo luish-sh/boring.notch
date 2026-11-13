@@ -13673,6 +13673,9 @@
         }
       }
     },
+    "Has events" : {
+
+    },
     "Helper Service Unavailable" : {
       "localizations" : {
         "fr" : {
@@ -26711,6 +26714,9 @@
           }
         }
       }
+    },
+    "Show dots on days with events" : {
+
     },
     "Show in Finder" : {
       "comment" : "Context menu item: Show in Finder",
