@@ -17,6 +17,8 @@ final class CalendarManager: ObservableObject {
 
     @Published var currentWeekStartDate: Date
     @Published var events: [EventModel] = []
+    /// Events across the date range shown by the day picker, used for per-day event indicators.
+    @Published var indicatorEvents: [EventModel] = []
     @Published var allCalendars: [CalendarModel] = []
     @Published var eventCalendars: [CalendarModel] = []
     @Published var reminderLists: [CalendarModel] = []
@@ -24,6 +26,7 @@ final class CalendarManager: ObservableObject {
     @Published var calendarAuthorizationStatus: EKAuthorizationStatus = .notDetermined
     @Published var reminderAuthorizationStatus: EKAuthorizationStatus = .notDetermined
     private var selectedCalendars: [CalendarModel] = []
+    private var indicatorInterval: DateInterval?
     private let calendarService = CalendarService()
 
     private var eventStoreChangedObserver: NSObjectProtocol?
@@ -68,6 +71,7 @@ final class CalendarManager: ObservableObject {
         self.reminderLists = all.filter { $0.isReminder }
         self.allCalendars = all // for legacy compatibility, can be removed if not needed
         updateSelectedCalendars()
+        await refreshEventIndicators()
     }
 
     func checkCalendarAuthorization() async {
@@ -178,6 +182,7 @@ final class CalendarManager: ObservableObject {
         Defaults[.calendarSelectionState] = selectionState
         updateSelectedCalendars()
         await updateEvents()
+        await refreshEventIndicators()
     }
 
     static func startOfDay(_ date: Date) -> Date {
@@ -199,6 +204,29 @@ final class CalendarManager: ObservableObject {
         self.events = eventsResult
     }
 
+    /// Sets the date range used for per-day event indicators and fetches events for it.
+    func updateEventIndicators(for interval: DateInterval) async {
+        indicatorInterval = interval
+        await refreshEventIndicators()
+    }
+
+    private func refreshEventIndicators() async {
+        guard let interval = indicatorInterval else { return }
+        // Skip the extra fetch entirely when the indicators are turned off
+        guard Defaults[.showCalendarEventIndicators] else {
+            indicatorEvents = []
+            return
+        }
+        let result = await calendarService.events(
+            from: interval.start,
+            to: interval.end,
+            calendars: selectedCalendars.map { $0.id }
+        )
+        // Paging weeks quickly can overlap fetches; drop results for a range that's no longer shown
+        guard indicatorInterval == interval else { return }
+        indicatorEvents = result
+    }
+
     func setReminderCompleted(reminderID: String, completed: Bool) async {
         await calendarService.setReminderCompleted(reminderID: reminderID, completed: completed)
         // Refresh events after updating
@@ -206,5 +234,6 @@ final class CalendarManager: ObservableObject {
             from: currentWeekStartDate,
             to: Calendar.current.date(byAdding: .day, value: 1, to: currentWeekStartDate)!,
             calendars: selectedCalendars.map { $0.id })
+        await refreshEventIndicators()
     }
 }
