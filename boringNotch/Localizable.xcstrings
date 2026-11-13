@@ -13719,6 +13719,9 @@
         }
       }
     },
+    "Has events" : {
+
+    },
     "Hide all-day events" : {
       "localizations" : {
         "cs" : {
@@ -26711,6 +26714,9 @@
           }
         }
       }
+    },
+    "Show an indicator when day has an event" : {
+
     },
     "Show in Finder" : {
       "comment" : "Context menu item: Show in Finder",

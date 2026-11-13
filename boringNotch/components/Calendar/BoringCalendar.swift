@@ -18,6 +18,30 @@ struct Config: Equatable {
     var offset: Int = 2  // Number of dates to the left of the selected date
 }
 
+/// Small dot drawn under a day's number when that day has at least one visible event.
+/// Overlaid on the date circle (not stacked) so the pickers' row height is unchanged.
+private struct EventIndicatorDot: ViewModifier {
+    let hasEvents: Bool
+    let isSelected: Bool
+
+    func body(content: Content) -> some View {
+        content.overlay(alignment: .bottom) {
+            if hasEvents {
+                Circle()
+                    .fill(isSelected ? Color.white : Color.effectiveAccent)
+                    .frame(width: 4, height: 4)
+                    .offset(y: 4)
+            }
+        }
+    }
+}
+
+private extension View {
+    func eventIndicator(hasEvents: Bool, isSelected: Bool) -> some View {
+        modifier(EventIndicatorDot(hasEvents: hasEvents, isSelected: isSelected))
+    }
+}
+
 /// The default scrolling day "dial": a horizontal strip of days centered on the selection.
 struct WheelPicker: View {
     @EnvironmentObject var vm: BoringViewModel
@@ -29,6 +53,8 @@ struct WheelPicker: View {
     @State private var isHovering: Bool = false
     @State private var scrollMonitor: Any?
     let config: Config
+    /// Start-of-day dates that have at least one visible event.
+    var eventDays: Set<Date> = []
 
     private let scrollThreshold: CGFloat = 2.0
 
@@ -148,10 +174,12 @@ struct WheelPicker: View {
         date: Date, isSelected: Bool, id: Int, onClick: @escaping () -> Void
     ) -> some View {
         let isToday = Calendar.current.isDateInToday(date)
+        let hasEvents = eventDays.contains(Calendar.current.startOfDay(for: date))
         return Button(action: onClick) {
             VStack(spacing: 8) {
                 dayText(date: dateToString(for: date), isToday: isToday, isSelected: isSelected)
                 dateCircle(date: date, isToday: isToday, isSelected: isSelected)
+                    .eventIndicator(hasEvents: hasEvents, isSelected: isSelected)
             }
             .padding(.vertical, 4)
             .padding(.horizontal, 4)
@@ -161,6 +189,7 @@ struct WheelPicker: View {
         }
         .buttonStyle(PlainButtonStyle())
         .id(id)
+        .accessibilityValue(hasEvents ? "Has events" : "")
     }
 
     private func dayText(date: String, isToday: Bool, isSelected: Bool) -> some View {
@@ -243,6 +272,8 @@ struct WheelPicker: View {
 /// first weekday. The wheel and the ‹ › chevrons page a whole week.
 struct WeekStripPicker: View {
     @Binding var selectedDate: Date
+    /// Start-of-day dates that have at least one visible event.
+    var eventDays: Set<Date> = []
     @Default(.weekStartDay) private var weekStartDay
     @State private var displayedWeekStart: Date = Date()
     @State private var slideForward: Bool = true
@@ -419,6 +450,7 @@ struct WeekStripPicker: View {
     private func dateButton(date: Date) -> some View {
         let isSelected = calendar.isDate(date, inSameDayAs: selectedDate)
         let isToday = calendar.isDateInToday(date)
+        let hasEvents = eventDays.contains(calendar.startOfDay(for: date))
         return Button {
             selectDate(date)
         } label: {
@@ -427,6 +459,7 @@ struct WeekStripPicker: View {
                     .font(.caption)
                     .foregroundColor(isSelected ? .white : Color(white: 0.65))
                 dateCircle(date: date, isToday: isToday, isSelected: isSelected)
+                    .eventIndicator(hasEvents: hasEvents, isSelected: isSelected)
             }
             .padding(.vertical, 4)
             .frame(maxWidth: .infinity)
@@ -441,6 +474,7 @@ struct WeekStripPicker: View {
             .contentShape(.rect)
         }
         .buttonStyle(PlainButtonStyle())
+        .accessibilityValue(hasEvents ? "Has events" : "")
     }
 
     private func dateCircle(date: Date, isToday: Bool, isSelected: Bool) -> some View {
@@ -469,6 +503,53 @@ struct CalendarView: View {
     @ObservedObject private var calendarManager = CalendarManager.shared
     @State private var selectedDate = Date()
     @Default(.calendarWeekView) private var calendarWeekView
+    @Default(.weekStartDay) private var weekStartDay
+    // Observed so the event indicators re-render when these filters change
+    @Default(.hideAllDayEvents) private var hideAllDayEvents
+    @Default(.hideCompletedReminders) private var hideCompletedReminders
+    @Default(.showCalendarEventIndicators) private var showEventIndicators
+    private let config = Config()
+
+    /// Date range the event indicators cover.
+    /// - Day dial: the dial's full fixed range, [today - past, today + future + 1 day).
+    /// - Week strip: the displayed week plus one week either side, so paging shows dots immediately.
+    private var indicatorInterval: DateInterval {
+        var cal = Calendar.current
+        let start: Date
+        let end: Date
+        if calendarWeekView {
+            cal.firstWeekday = weekStartDay.firstWeekday
+            let weekStart = cal.dateInterval(of: .weekOfYear, for: selectedDate)?.start
+                ?? cal.startOfDay(for: selectedDate)
+            start = cal.date(byAdding: .day, value: -7, to: weekStart) ?? weekStart
+            end = cal.date(byAdding: .day, value: 14, to: weekStart) ?? weekStart
+        } else {
+            let today = cal.startOfDay(for: Date())
+            start = cal.date(byAdding: .day, value: -config.past, to: today) ?? today
+            end = cal.date(byAdding: .day, value: config.future + 1, to: today) ?? today
+        }
+        return DateInterval(start: start, end: max(start, end))
+    }
+
+    /// Start-of-day dates within the indicator range that contain at least one visible event.
+    private var eventDays: Set<Date> {
+        guard showEventIndicators else { return [] }
+        let cal = Calendar.current
+        let range = indicatorInterval
+        var days = Set<Date>()
+        for event in EventListView.filteredEvents(events: calendarManager.indicatorEvents) {
+            // Treat the end as exclusive so events ending exactly at midnight don't mark the next day
+            let lastInstant = event.end > event.start ? event.end.addingTimeInterval(-1) : event.start
+            var day = max(cal.startOfDay(for: event.start), range.start)
+            let lastDay = cal.startOfDay(for: lastInstant)
+            while day <= lastDay && day < range.end {
+                days.insert(day)
+                guard let next = cal.date(byAdding: .day, value: 1, to: day) else { break }
+                day = next
+            }
+        }
+        return days
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -497,12 +578,23 @@ struct CalendarView: View {
             Task {
                 await calendarManager.updateCurrentDate(Date.now)
                 selectedDate = Date.now
+                await calendarManager.updateEventIndicators(for: indicatorInterval)
             }
         }
         .onAppear {
             Task {
                 await calendarManager.updateCurrentDate(Date.now)
                 selectedDate = Date.now
+            }
+        }
+        // Runs on appear and whenever the covered range changes (week paged, mode or week start switched)
+        .task(id: indicatorInterval) {
+            await calendarManager.updateEventIndicators(for: indicatorInterval)
+        }
+        // Fetch when switched on, clear the cached events when switched off
+        .onChange(of: showEventIndicators) {
+            Task {
+                await calendarManager.updateEventIndicators(for: indicatorInterval)
             }
         }
     }
@@ -523,7 +615,7 @@ struct CalendarView: View {
             }
             .padding(.horizontal, 4)
 
-            WeekStripPicker(selectedDate: $selectedDate)
+            WeekStripPicker(selectedDate: $selectedDate, eventDays: eventDays)
         }
         .fixedSize(horizontal: false, vertical: true)
     }
@@ -543,7 +635,7 @@ struct CalendarView: View {
             }
 
             ZStack(alignment: .top) {
-                WheelPicker(selectedDate: $selectedDate, config: Config())
+                WheelPicker(selectedDate: $selectedDate, config: config, eventDays: eventDays)
                 HStack(alignment: .top) {
                     LinearGradient(
                         colors: [Color.black, .clear], startPoint: .leading, endPoint: .trailing
