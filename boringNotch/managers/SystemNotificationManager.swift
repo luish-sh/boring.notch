@@ -22,8 +22,19 @@ final class SystemNotificationManager: ObservableObject {
 
     @Published private(set) var activeNotification: SystemNotification?
     @Published private(set) var queuedNotifications: [SystemNotification] = []
+    /// Everything that passed the app filter, newest first, until it's opened
+    /// or cleared. Banners only last a few seconds; this is where a missed one
+    /// can still be found. Kept in memory only, since notification text can
+    /// be private.
+    @Published private(set) var trayNotifications: [SystemNotification] = []
+    /// Tray entries the user hasn't seen yet, either in the tray or by
+    /// hovering the banner.
+    @Published private(set) var unreadNotificationIDs: Set<String> = []
+
+    var unreadCount: Int { unreadNotificationIDs.count }
 
     private let queueLimit = 5
+    private let trayLimit = 50
     private let displayDuration: TimeInterval = 8
     private var dismissTask: Task<Void, Never>?
     private var notificationObserver: NSObjectProtocol?
@@ -53,8 +64,42 @@ final class SystemNotificationManager: ObservableObject {
     func stop() {
         XPCHelperClient.shared.stopNotificationWatching()
         queuedNotifications.removeAll()
+        clearTray()
         isUserPresent = false
         dismissActive()
+    }
+
+    // MARK: - Tray
+
+    func markRead(_ id: String) {
+        unreadNotificationIDs.remove(id)
+    }
+
+    func markAllRead() {
+        guard !unreadNotificationIDs.isEmpty else { return }
+        unreadNotificationIDs.removeAll()
+    }
+
+    func removeFromTray(_ id: String) {
+        trayNotifications.removeAll { $0.id == id }
+        unreadNotificationIDs.remove(id)
+    }
+
+    func clearTray() {
+        trayNotifications.removeAll()
+        unreadNotificationIDs.removeAll()
+    }
+
+    private func addToTray(_ notification: SystemNotification) {
+        guard Defaults[.notificationTray],
+              !trayNotifications.contains(where: { $0.id == notification.id }) else { return }
+        trayNotifications.insert(notification, at: 0)
+        unreadNotificationIDs.insert(notification.id)
+        if trayNotifications.count > trayLimit {
+            let dropped = trayNotifications.suffix(from: trayLimit).map(\.id)
+            trayNotifications.removeLast(trayNotifications.count - trayLimit)
+            unreadNotificationIDs.subtract(dropped)
+        }
     }
 
     func holdActive() {
@@ -152,6 +197,9 @@ final class SystemNotificationManager: ObservableObject {
             receivedAt: Date()
         )
         guard isAllowed(notification) else { return }
+        // Before the banner logic: a notification that gets pushed out of the
+        // banner queue still ends up in the tray.
+        addToTray(notification)
         guard activeNotification == nil else {
             guard isUserPresent else {
                 show(notification)

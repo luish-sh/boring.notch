@@ -13,11 +13,19 @@ struct BoringHeader: View {
     @ObservedObject var batteryModel = BatteryStatusViewModel.shared
     @ObservedObject var coordinator = BoringViewCoordinator.shared
     @StateObject var shelfState = ShelfStateViewModel.shared
+    @ObservedObject var notificationManager = SystemNotificationManager.shared
+    @Default(.settingsIconInNotch) private var settingsIconInNotch
+    @Default(.showMirror) private var showMirror
+    @Default(.showBatteryIndicator) private var showBatteryIndicator
     var body: some View {
         HStack(spacing: 0) {
             HStack {
-                if (!shelfState.isEmpty || coordinator.alwaysShowTabs) && Defaults[.boringShelf] {
-                    TabSelectionView()
+                let visibleTabs = visibleNotchTabs(
+                    shelfIsEmpty: shelfState.isEmpty,
+                    trayIsEmpty: notificationManager.trayNotifications.isEmpty
+                )
+                if visibleTabs.count > 1 {
+                    TabSelectionView(visibleTabs: visibleTabs)
                 } else if vm.notchState == .open {
                     EmptyView()
                 }
@@ -47,7 +55,7 @@ struct BoringHeader: View {
                         )
                             .transition(.scale(scale: 0.8).combined(with: .opacity))
                     } else {
-                        if Defaults[.showMirror] && coordinator.currentView == .home {
+                        if showMirror && coordinator.currentView == .home {
                             Button(action: {
                                 vm.toggleCameraPreview()
                             }) {
@@ -63,7 +71,7 @@ struct BoringHeader: View {
                             }
                             .buttonStyle(PlainButtonStyle())
                         }
-                        if Defaults[.settingsIconInNotch] {
+                        if settingsIconInNotch {
                             Button(action: {
                                 DispatchQueue.main.async {
                                     SettingsWindowController.shared.showWindow()
@@ -81,7 +89,7 @@ struct BoringHeader: View {
                             }
                             .buttonStyle(PlainButtonStyle())
                         }
-                        if Defaults[.showBatteryIndicator] {
+                        if showBatteryIndicator {
                             BoringBatteryView(
                                 batteryWidth: 30,
                                 isCharging: batteryModel.isCharging,

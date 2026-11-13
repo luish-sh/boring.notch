@@ -5,7 +5,7 @@
 
 import SwiftUI
 
-private struct NotificationSourceIcon: View {
+struct NotificationSourceIcon: View {
     let bundleID: String?
     let size: CGFloat
 
@@ -150,13 +150,18 @@ struct NotificationExpandedView: View {
             }
             .padding(.trailing, 4)
         }
-        .onAppear { manager.holdActive() }
+        .onAppear {
+            manager.holdActive()
+            // Expanded on screen counts as seen; it stays in the tray.
+            manager.markRead(notification.id)
+        }
         .onDisappear { manager.resumeDismiss() }
     }
 
     private func openSourceApp() {
         Task {
             guard await manager.open(notification) else { return }
+            manager.removeFromTray(notification.id)
             manager.dismissActive(token: notification.id)
         }
     }

@@ -31,8 +31,12 @@ struct NotificationSettingsView: View {
                 Defaults.Toggle(key: .notificationLiveActivity) {
                     Text("Show notifications in the notch")
                 }
+                Defaults.Toggle(key: .notificationTray) {
+                    Text("Keep notifications in a tray")
+                }
+                .disabled(!notificationLiveActivity)
             } footer: {
-                Text("Requires \(AccessibilityPermission.displayName). Only visible banners are mirrored.")
+                Text("Requires \(AccessibilityPermission.displayName). Only visible banners are mirrored. The tray adds a Notifications tab to the open notch and keeps notifications until you open or clear them; it's emptied when the app quits.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

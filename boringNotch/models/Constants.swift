@@ -517,6 +517,9 @@ extension Defaults.Keys {
         "notificationAllowedApps",
         default: []
     )
+    /// Keeps mirrored notifications in a tray tab in the open notch after
+    /// their banner disappears.
+    static let notificationTray = Key<Bool>("notificationTray", default: true)
     static let enableGradient = Key<Bool>("enableGradient", default: false)
     static let systemEventIndicatorShadow = Key<Bool>("systemEventIndicatorShadow", default: false)
     static let systemEventIndicatorUseAccent = Key<Bool>("systemEventIndicatorUseAccent", default: false)

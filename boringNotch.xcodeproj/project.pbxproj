@@ -141,6 +141,7 @@
 		A330CD0EA12B4CD187E237FA /* PowerStatusNotice.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B78717F39D486190A1E34C /* PowerStatusNotice.swift */; };
 		5C5D0A012F9B000100A1B2C3 /* SpaceSwitchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C5D0A022F9B000100A1B2C3 /* SpaceSwitchManager.swift */; };
 		5C5D0A032F9B000100A1B2C3 /* SpaceSwitchNotice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C5D0A042F9B000100A1B2C3 /* SpaceSwitchNotice.swift */; };
+		5C5D0A052F9B000100A1B2C3 /* NotificationTrayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C5D0A062F9B000100A1B2C3 /* NotificationTrayView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -313,6 +314,7 @@
 		D8B78717F39D486190A1E34C /* PowerStatusNotice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerStatusNotice.swift; sourceTree = "<group>"; };
 		5C5D0A022F9B000100A1B2C3 /* SpaceSwitchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpaceSwitchManager.swift; sourceTree = "<group>"; };
 		5C5D0A042F9B000100A1B2C3 /* SpaceSwitchNotice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpaceSwitchNotice.swift; sourceTree = "<group>"; };
+		5C5D0A062F9B000100A1B2C3 /* NotificationTrayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationTrayView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -773,6 +775,7 @@
 			children = (
 				D8B78717F39D486190A1E34C /* PowerStatusNotice.swift */,
 				5C5D0A042F9B000100A1B2C3 /* SpaceSwitchNotice.swift */,
+				5C5D0A062F9B000100A1B2C3 /* NotificationTrayView.swift */,
 				AA01NLA22E7A0001 /* NotificationLiveActivity.swift */,
 				AA06CHV22E7A0001 /* CompactHomeView.swift */,
 				AA04LAS22E7A0001 /* LiveActivityStack.swift */,
@@ -1040,6 +1043,7 @@
 				11985BF42F38520A00F81585 /* DraggableProgressBar.swift in Sources */,
 				A330CD0EA12B4CD187E237FA /* PowerStatusNotice.swift in Sources */,
 				5C5D0A032F9B000100A1B2C3 /* SpaceSwitchNotice.swift in Sources */,
+				5C5D0A052F9B000100A1B2C3 /* NotificationTrayView.swift in Sources */,
 				5C5D0A012F9B000100A1B2C3 /* SpaceSwitchManager.swift in Sources */,
 				9AB0C6BD2C73C9CB00F7CD30 /* NotchHomeView.swift in Sources */,
 				B172AAC02C95DA0B001623F1 /* InlineOSD.swift in Sources */,

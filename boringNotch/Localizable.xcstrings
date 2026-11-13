@@ -461,6 +461,9 @@
         }
       }
     },
+    "%lld unread" : {
+
+    },
     "+%lld" : {
       "localizations" : {
         "de" : {
@@ -566,6 +569,9 @@
           }
         }
       }
+    },
+    "9+" : {
+
     },
     "About" : {
       "localizations" : {
@@ -6738,6 +6744,9 @@
           }
         }
       }
+    },
+    "Clear All" : {
+
     },
     "Clear slot" : {
       "localizations" : {
@@ -15739,6 +15748,9 @@
         }
       }
     },
+    "Keep notifications in a tray" : {
+
+    },
     "Keyboard brightness currently supports the built-in source only." : {
       "comment" : "Text displayed in a section of the OSD settings for the keyboard brightness setting.",
       "localizations" : {
@@ -19661,6 +19673,9 @@
         }
       }
     },
+    "No notifications" : {
+
+    },
     "Normalize gesture direction" : {
       "localizations" : {
         "de" : {
@@ -20346,6 +20361,9 @@
           }
         }
       }
+    },
+    "Notification" : {
+
     },
     "Notifications" : {
       "localizations" : {
@@ -24584,6 +24602,9 @@
         }
       }
     },
+    "Remove notification" : {
+
+    },
     "Rename" : {
       "comment" : "Context menu item: Rename",
       "localizations" : {
@@ -24896,6 +24917,7 @@
     },
     "Requires %@. Only visible banners are mirrored." : {
       "comment" : "A note that explains that the notification settings require Accessibility to function.",
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -24928,6 +24950,9 @@
           }
         }
       }
+    },
+    "Requires %@. Only visible banners are mirrored. The tray adds a Notifications tab to the open notch and keeps notifications until you open or clear them; it's emptied when the app quits." : {
+
     },
     "Requires a third-party client with API plugin enabled." : {
       "comment" : "Onboarding description of the YouTube Music source.",

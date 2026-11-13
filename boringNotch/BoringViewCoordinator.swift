@@ -93,6 +93,7 @@ final class BoringViewCoordinator: ObservableObject {
     private var boringShelfCancellable: AnyCancellable?
     private var osdSourceCancellables: [AnyCancellable] = []
     private var notificationLiveActivityCancellable: AnyCancellable?
+    private var notificationTrayCancellable: AnyCancellable?
     private var spaceSwitchIndicatorCancellable: AnyCancellable?
     private var uiEventCancellable: AnyCancellable?
 
@@ -199,12 +200,28 @@ final class BoringViewCoordinator: ObservableObject {
         // Observe changes to the notification live activity toggle; it owns
         // the notification watcher lifecycle.
         notificationLiveActivityCancellable = Defaults.publisher(.notificationLiveActivity)
-            .sink { change in
+            .sink { [weak self] change in
                 Task { @MainActor in
                     if change.newValue {
                         await SystemNotificationManager.shared.start()
                     } else {
+                        // stop() also empties the tray.
                         SystemNotificationManager.shared.stop()
+                        if self?.currentView == .notifications {
+                            self?.currentView = .home
+                        }
+                    }
+                }
+            }
+
+        // Turning the tray off hides its tab and drops what it was holding.
+        notificationTrayCancellable = Defaults.publisher(.notificationTray)
+            .sink { [weak self] change in
+                Task { @MainActor in
+                    guard !change.newValue else { return }
+                    SystemNotificationManager.shared.clearTray()
+                    if self?.currentView == .notifications {
+                        self?.currentView = .home
                     }
                 }
             }
