@@ -93,6 +93,7 @@ final class BoringViewCoordinator: ObservableObject {
     private var boringShelfCancellable: AnyCancellable?
     private var osdSourceCancellables: [AnyCancellable] = []
     private var notificationLiveActivityCancellable: AnyCancellable?
+    private var spaceSwitchIndicatorCancellable: AnyCancellable?
     private var uiEventCancellable: AnyCancellable?
 
     private init() {
@@ -154,6 +155,8 @@ final class BoringViewCoordinator: ObservableObject {
                             icon: icon, accent: accent, targetScreenUUID: uuid)
                     case .expandingView(let type):
                         self.toggleExpandingView(status: true, type: type)
+                    case .spaceSwitch(let info, let uuids):
+                        self.showSpaceSwitch(info, on: uuids)
                     }
                 }
             }
@@ -206,6 +209,20 @@ final class BoringViewCoordinator: ObservableObject {
                 }
             }
 
+        // The Space switch toggle owns the Spaces watcher. start() is
+        // idempotent, so the launch task below starting it as well is safe.
+        spaceSwitchIndicatorCancellable = Defaults.publisher(.showSpaceSwitchIndicator)
+            .sink { [weak self] change in
+                Task { @MainActor in
+                    if change.newValue {
+                        SpaceSwitchManager.shared.start()
+                    } else {
+                        SpaceSwitchManager.shared.stop()
+                        self?.hideAllSpaceSwitchNotices()
+                    }
+                }
+            }
+
         Task { @MainActor in
             helloAnimationRunning = firstLaunch
 
@@ -215,6 +232,10 @@ final class BoringViewCoordinator: ObservableObject {
 
             if Defaults[.notificationLiveActivity] {
                 await SystemNotificationManager.shared.start()
+            }
+
+            if Defaults[.showSpaceSwitchIndicator] {
+                SpaceSwitchManager.shared.start()
             }
             self.applyOSDSources()
         }
@@ -377,6 +398,46 @@ final class BoringViewCoordinator: ObservableObject {
                     }
                 }
             }
+        }
+    }
+
+    // MARK: - Space Switch Notices
+
+    /// The Space switch notice showing on each screen, keyed by display UUID.
+    @Published private(set) var spaceSwitchNotices: [String: SpaceSwitchInfo] = [:]
+    private var spaceSwitchTasks: [String: Task<Void, Never>] = [:]
+
+    func showSpaceSwitch(_ info: SpaceSwitchInfo, on screenUUIDs: [String], duration: TimeInterval = 2) {
+        guard Defaults[.showSpaceSwitchIndicator] else { return }
+
+        for uuid in screenUUIDs {
+            withAnimation(.smooth) {
+                spaceSwitchNotices[uuid] = info
+            }
+
+            // Switching again before the notice hides restarts its timer.
+            spaceSwitchTasks[uuid]?.cancel()
+            spaceSwitchTasks[uuid] = Task { [weak self] in
+                try? await Task.sleep(for: .seconds(duration))
+                guard let self, !Task.isCancelled else { return }
+                withAnimation(.smooth) {
+                    self.spaceSwitchNotices[uuid] = nil
+                }
+                self.spaceSwitchTasks[uuid] = nil
+            }
+        }
+    }
+
+    func spaceSwitchNotice(for screenUUID: String?) -> SpaceSwitchInfo? {
+        guard let uuid = screenUUID else { return nil }
+        return spaceSwitchNotices[uuid]
+    }
+
+    private func hideAllSpaceSwitchNotices() {
+        spaceSwitchTasks.values.forEach { $0.cancel() }
+        spaceSwitchTasks.removeAll()
+        withAnimation(.smooth) {
+            spaceSwitchNotices.removeAll()
         }
     }
 

@@ -26,6 +26,7 @@ struct NotchSettingsView: View {
         Form {
             sizingSection
             behaviorSection
+            spacesSection
             gesturesSection
             windowSection
         }
@@ -178,6 +179,20 @@ struct NotchSettingsView: View {
             Text("Behavior")
         } footer: {
             Text("Shows a smaller opened notch with just the music player — no tabs, calendar or mirror.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var spacesSection: some View {
+        Section {
+            Defaults.Toggle(key: .showSpaceSwitchIndicator) {
+                Text("Show indicator when switching Spaces")
+            }
+        } header: {
+            Text("Spaces")
+        } footer: {
+            Text("Briefly shows the name and icon of the Space you switch to, such as Desktop 2 or a full-screen app.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

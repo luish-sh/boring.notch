@@ -158,6 +158,7 @@ struct ContentView: View {
         case hello
         case nowPlayingFallback
         case batteryStatus
+        case spaceSwitch(SpaceSwitchInfo)
         case osd(SneakContentType)
         case activities([LiveActivityItem])
         case face
@@ -171,6 +172,9 @@ struct ContentView: View {
            coordinator.expandingView.type == .battery,
            Defaults[.showPowerStatusNotifications] {
             return .batteryStatus
+        }
+        if let notice = activeSpaceSwitchNotice {
+            return .spaceSwitch(notice)
         }
         if coordinator.shouldShowSneakPeek(on: vm.screenUUID) {
             return .osd(coordinator.sneakPeekState(for: vm.screenUUID).type)
@@ -196,6 +200,8 @@ struct ContentView: View {
         } else if coordinator.expandingView.type == .battery && coordinator.expandingView.show
             && vm.notchState == .closed && Defaults[.showPowerStatusNotifications] {
             chinWidth = 640
+        } else if activeSpaceSwitchNotice != nil {
+            chinWidth += spaceSwitchNoticeSideWidth * 2
         } else if vm.notchState == .closed, !vm.hideOnClosed, let activity = selectedActivity {
             // Sized for whichever activity is actually on top, not for
             // whichever happens to exist — otherwise swiping to music while a
@@ -221,6 +227,17 @@ struct ContentView: View {
 
         return chinWidth
     }
+
+    /// The Space switch notice for this screen, only while the notch is
+    /// closed: an open notch already covers the area it would use.
+    private var activeSpaceSwitchNotice: SpaceSwitchInfo? {
+        guard vm.notchState == .closed else { return nil }
+        return coordinator.spaceSwitchNotice(for: vm.screenUUID)
+    }
+
+    /// Hover-strip allowance for each side of the Space switch notice: room
+    /// for the icon or a short name such as "Desktop 12".
+    private let spaceSwitchNoticeSideWidth: CGFloat = 110
 
     private var shouldDisplayNowPlayingFallbackNotice: Bool {
         vm.notchState == .closed && nowPlayingFallbackNoticeActive
@@ -436,6 +453,13 @@ struct ContentView: View {
                     } else if coordinator.expandingView.type == .battery && coordinator.expandingView.show
                         && vm.notchState == .closed && Defaults[.showPowerStatusNotifications] {
                         PowerStatusNotice(notchWidth: vm.closedNotchSize.width, height: displayClosedNotchHeight)
+                        } else if let spaceNotice = activeSpaceSwitchNotice {
+                            SpaceSwitchNotice(
+                                info: spaceNotice,
+                                notchWidth: vm.closedNotchSize.width,
+                                height: displayClosedNotchHeight
+                            )
+                            .transition(.opacity)
                         } else if coordinator.shouldShowSneakPeek(on: vm.screenUUID) && Defaults[.inlineOSD] && (coordinator.sneakPeekState(for: vm.screenUUID).type != .music) && (coordinator.sneakPeekState(for: vm.screenUUID).type != .battery) && vm.notchState == .closed {
                            InlineOSD(
                               type: coordinator.binding(for: vm.screenUUID).type,

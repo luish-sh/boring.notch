@@ -4258,6 +4258,9 @@
         }
       }
     },
+    "Briefly shows the name and icon of the Space you switch to, such as Desktop 2 or a full-screen app." : {
+
+    },
     "Brightness" : {
       "localizations" : {
         "de" : {
@@ -9723,6 +9726,9 @@
         }
       }
     },
+    "Desktop %lld" : {
+
+    },
     "Device Control and Data Access" : {
       "localizations" : {
         "en" : {
@@ -12779,6 +12785,9 @@
         }
       }
     },
+    "Full Screen" : {
+
+    },
     "Full screen behavior" : {
       "localizations" : {
         "cs" : {
@@ -13673,6 +13682,9 @@
         }
       }
     },
+    "Has events" : {
+
+    },
     "Helper Service Unavailable" : {
       "localizations" : {
         "fr" : {
@@ -13718,9 +13730,6 @@
           }
         }
       }
-    },
-    "Has events" : {
-
     },
     "Hide all-day events" : {
       "localizations" : {
@@ -26715,7 +26724,7 @@
         }
       }
     },
-    "Show an indicator when day has an event" : {
+    "Show dots on days with events" : {
 
     },
     "Show in Finder" : {
@@ -26842,6 +26851,9 @@
           }
         }
       }
+    },
+    "Show indicator when switching Spaces" : {
+
     },
     "Show lyrics below artist name" : {
       "localizations" : {
@@ -29145,6 +29157,9 @@
           }
         }
       }
+    },
+    "Spaces" : {
+
     },
     "Speed" : {
       "extractionState" : "stale",

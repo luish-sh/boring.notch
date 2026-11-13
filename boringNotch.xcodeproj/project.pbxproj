@@ -139,6 +139,8 @@
 		F1F2A0A100000000000000F1 /* AudioCaptureManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F2A0A200000000000000F2 /* AudioCaptureManager.swift */; };
 		F38DE6482D8243E7008B5C6D /* BatteryActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F38DE6472D8243E2008B5C6D /* BatteryActivityManager.swift */; };
 		A330CD0EA12B4CD187E237FA /* PowerStatusNotice.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B78717F39D486190A1E34C /* PowerStatusNotice.swift */; };
+		5C5D0A012F9B000100A1B2C3 /* SpaceSwitchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C5D0A022F9B000100A1B2C3 /* SpaceSwitchManager.swift */; };
+		5C5D0A032F9B000100A1B2C3 /* SpaceSwitchNotice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C5D0A042F9B000100A1B2C3 /* SpaceSwitchNotice.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -309,6 +311,8 @@
 		F1F2A0A200000000000000F2 /* AudioCaptureManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCaptureManager.swift; sourceTree = "<group>"; };
 		F38DE6472D8243E2008B5C6D /* BatteryActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryActivityManager.swift; sourceTree = "<group>"; };
 		D8B78717F39D486190A1E34C /* PowerStatusNotice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerStatusNotice.swift; sourceTree = "<group>"; };
+		5C5D0A022F9B000100A1B2C3 /* SpaceSwitchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpaceSwitchManager.swift; sourceTree = "<group>"; };
+		5C5D0A042F9B000100A1B2C3 /* SpaceSwitchNotice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpaceSwitchNotice.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -578,6 +582,7 @@
 				11DB26652EDD0BE1001EA0CF /* LyricsService.swift */,
 				11D58EA12E760AE100FA8377 /* ImageService.swift */,
 				F38DE6472D8243E2008B5C6D /* BatteryActivityManager.swift */,
+				5C5D0A022F9B000100A1B2C3 /* SpaceSwitchManager.swift */,
 				112FB7342CCF16F70015238C /* NotchSpaceManager.swift */,
 				EAB1C3E8B149445A9E57C6AF /* NotchWindowManager.swift */,
 				AA01SNM22E7A0001 /* SystemNotificationManager.swift */,
@@ -767,6 +772,7 @@
 			isa = PBXGroup;
 			children = (
 				D8B78717F39D486190A1E34C /* PowerStatusNotice.swift */,
+				5C5D0A042F9B000100A1B2C3 /* SpaceSwitchNotice.swift */,
 				AA01NLA22E7A0001 /* NotificationLiveActivity.swift */,
 				AA06CHV22E7A0001 /* CompactHomeView.swift */,
 				AA04LAS22E7A0001 /* LiveActivityStack.swift */,
@@ -1033,6 +1039,8 @@
 				1153BD8F2D986B1F00979FB0 /* MediaControllerProtocol.swift in Sources */,
 				11985BF42F38520A00F81585 /* DraggableProgressBar.swift in Sources */,
 				A330CD0EA12B4CD187E237FA /* PowerStatusNotice.swift in Sources */,
+				5C5D0A032F9B000100A1B2C3 /* SpaceSwitchNotice.swift in Sources */,
+				5C5D0A012F9B000100A1B2C3 /* SpaceSwitchManager.swift in Sources */,
 				9AB0C6BD2C73C9CB00F7CD30 /* NotchHomeView.swift in Sources */,
 				B172AAC02C95DA0B001623F1 /* InlineOSD.swift in Sources */,
 				1153BD912D986DB300979FB0 /* PlaybackState.swift in Sources */,

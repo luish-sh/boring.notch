@@ -28,6 +28,8 @@ enum NotchUIEvent {
         duration: TimeInterval = 1.5
     )
     case expandingView(type: SneakContentType)
+    /// The current Space changed on the given screens (display UUIDs).
+    case spaceSwitch(info: SpaceSwitchInfo, targetScreenUUIDs: [String])
 }
 
 /// The event pipe. `BoringViewCoordinator` is the intended subscriber.

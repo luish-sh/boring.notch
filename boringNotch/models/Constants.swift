@@ -490,6 +490,9 @@ extension Defaults.Keys {
     static let showPowerStatusIcons = Key<Bool>("showPowerStatusIcons", default: true)
     static let showChargingWattage = Key<Bool>("showChargingWattage", default: true)
 
+    // MARK: Spaces
+    static let showSpaceSwitchIndicator = Key<Bool>("showSpaceSwitchIndicator", default: true)
+
     // MARK: Downloads
     static let enableDownloadListener = Key<Bool>("enableDownloadListener", default: true)
     static let enableSafariDownloads = Key<Bool>("enableSafariDownloads", default: true)
